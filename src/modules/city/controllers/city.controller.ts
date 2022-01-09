@@ -1,85 +1,55 @@
 import { Request, Response } from 'express';
-
 import { container } from 'tsyringe';
-import { idParamSchema } from '../../../common/validators';
+import { GetCustomerByNameUseCase } from '../../customer/useCases/getByName/getByName.customer.useCase';
+import { CreateCityUseCase } from '../useCases/create/create.city.useCase';
+import { GetCitiesByUfUseCase } from '../useCases/getByUf/getByUf.city.useCase';
+import {
+    createCitySchema,
+    getCitiesByUfSchema,
+    getCityByNameSchema,
+} from '../utils/validators';
 
-import { CreateCustomerUseCase } from '../useCases/create/create.customer.useCase';
-import { DeleteCustomerUseCase } from '../useCases/delete/delete.customer.useCase';
-import { GetCustomerByIdUseCase } from '../useCases/getById/getById.customer.useCase';
-import { UpdateCustomerUseCase } from '../useCases/update/update.customer.useCase';
-import { createCustomerSchema, updateCustomerSchema } from '../utils/validators';
-
-export class CustomerController {
+export class CityController {
     public async store(request: Request, response: Response): Promise<Response> {
-        await createCustomerSchema.validate(request.body, {
+        await createCitySchema.validate(request.body, {
             abortEarly: false,
             stripUnknown: true,
         });
 
-        const { name, email, password, passwordConfirmation } = request.body;
+        const { body } = request;
 
-        const createCustomerUseCase = container.resolve(CreateCustomerUseCase);
+        const createCityUseCase = container.resolve(CreateCityUseCase);
 
-        const result = await createCustomerUseCase.execute({
-            name,
-            email,
-            password,
-            passwordConfirmation,
+        const result = await createCityUseCase.execute({
+            ...body,
         });
 
-        const { password: createdPassword, ...customerCreated } = result;
-
-        return response.status(201).json(customerCreated);
+        return response.status(201).json(result);
     }
 
-    public async getById(request: Request, response: Response): Promise<Response> {
-        await idParamSchema.validate(request.params, {
+    public async getByName(request: Request, response: Response): Promise<Response> {
+        const query = await getCityByNameSchema.validate(request.query, {
             abortEarly: false,
             stripUnknown: true,
         });
 
-        const { id } = request.params;
+        const getCustomerByName = container.resolve(GetCustomerByNameUseCase);
 
-        const getCustomerById = container.resolve(GetCustomerByIdUseCase);
+        const foundCity = await getCustomerByName.execute(query.name);
 
-        const foundCustomer = await getCustomerById.execute(id);
-
-        return response.status(200).json(foundCustomer);
+        return response.status(200).json(foundCity);
     }
 
-    public async update(request: Request, response: Response): Promise<Response> {
-        await updateCustomerSchema.validate(request.body, {
+    public async getByUf(request: Request, response: Response): Promise<Response> {
+        const params = await getCitiesByUfSchema.validate(request.params, {
             abortEarly: false,
             stripUnknown: true,
         });
 
-        await idParamSchema.validate(request.params, {
-            abortEarly: false,
-            stripUnknown: true,
-        });
+        const getCitiesByUf = container.resolve(GetCitiesByUfUseCase);
 
-        const { id } = request.params;
-        const updateBody = request.body;
+        const foundCities = await getCitiesByUf.execute(params.uf);
 
-        const getCustomerById = container.resolve(UpdateCustomerUseCase);
-
-        const updatedCustomer = await getCustomerById.execute(id, updateBody);
-
-        return response.status(200).json(updatedCustomer);
-    }
-
-    public async delete(request: Request, response: Response): Promise<Response> {
-        await idParamSchema.validate(request.params, {
-            abortEarly: false,
-            stripUnknown: true,
-        });
-
-        const { id } = request.params;
-
-        const deleteCustomerUseCase = container.resolve(DeleteCustomerUseCase);
-
-        await deleteCustomerUseCase.execute(id);
-
-        return response.status(204).json();
+        return response.status(200).json(foundCities);
     }
 }

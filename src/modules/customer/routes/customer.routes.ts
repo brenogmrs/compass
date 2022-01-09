@@ -9,7 +9,7 @@ routes.post('/', customerController.store);
 
 routes.get('/:id', customerController.getById);
 
-routes.get('name/:name', customerController.getByName);
+routes.get('name', customerController.getByName);
 
 routes.put('/:id', customerController.update);
 

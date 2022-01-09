@@ -1,6 +1,10 @@
 import { container, delay } from 'tsyringe';
 import { CityRepository } from '../modules/city/repositories/city.repository';
 import { ICityRepository } from '../modules/city/repositories/interfaces/city.repository.interface';
+import { CreateCityUseCase } from '../modules/city/useCases/create/create.city.useCase';
+import { GetCityByIdUseCase } from '../modules/city/useCases/getById/getById.city.useCase';
+import { GetCityByNameUseCase } from '../modules/city/useCases/getByName/getByName.city.useCase';
+import { GetCitiesByUfUseCase } from '../modules/city/useCases/getByUf/getByUf.city.useCase';
 import { CustomerRepository } from '../modules/customer/repositories/customer.repository';
 import { ICustomerRepository } from '../modules/customer/repositories/interfaces/customer.repository.interface';
 import { CreateCustomerUseCase } from '../modules/customer/useCases/create/create.customer.useCase';
@@ -17,6 +21,26 @@ container.registerSingleton<ICustomerRepository>(
 container.registerSingleton<ICityRepository>(
     'CityRepository',
     delay(() => CityRepository),
+);
+
+container.registerSingleton<CreateCityUseCase>(
+    'CreateCityUseCase',
+    CreateCityUseCase,
+);
+
+container.registerSingleton<GetCityByIdUseCase>(
+    'GetCityByIdUseCase',
+    GetCityByIdUseCase,
+);
+
+container.registerSingleton<GetCityByNameUseCase>(
+    'GetCityByNameUseCase',
+    GetCityByNameUseCase,
+);
+
+container.registerSingleton<GetCitiesByUfUseCase>(
+    'GetCitiesByUfUseCase',
+    GetCitiesByUfUseCase,
 );
 
 container.registerSingleton<CreateCustomerUseCase>(
