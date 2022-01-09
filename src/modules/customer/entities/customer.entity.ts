@@ -27,5 +27,5 @@ export class CustomerEntity extends BaseEntity {
 
     @ManyToOne(() => CityEntity, city => city.customer, { eager: true })
     @JoinColumn({ name: 'city_id' })
-    city: CityEntity;
+    city?: CityEntity;
 }

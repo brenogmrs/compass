@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { HttpError } from '../../../../common/errors/http.error';
-import { Customer } from '../../entities/customer.entity';
+import { CustomerEntity } from '../../entities/customer.entity';
 import { IUpdateCustomer } from '../../interfaces/customer.interface';
 import { ICustomerRepository } from '../../repositories/interfaces/customer.repository.interface';
 import { GetCustomerByIdUseCase } from '../getById/getById.customer.useCase';
@@ -18,18 +18,10 @@ export class UpdateCustomerUseCase {
     public async execute(
         id: string,
         customerData: IUpdateCustomer,
-    ): Promise<Customer> {
+    ): Promise<CustomerEntity> {
         const foundCustomer = await this.getByIdUseCase.execute(id);
 
-        if (customerData.email) {
-            const foundCustomerByEmail = await this.customerRepository.findByEmail(
-                customerData.email,
-            );
-
-            if (foundCustomerByEmail) {
-                throw new HttpError('Email address already exists', 409);
-            }
-        }
+        //verificar se a cidade existe
 
         const updatedCustomer = {
             ...foundCustomer,

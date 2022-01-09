@@ -1,15 +1,29 @@
 import * as yup from 'yup';
 
 export const createCustomerSchema = yup.object().shape({
-    name: yup.string().required('The property name is required'),
-    email: yup.string().email().required('The property email is required'),
-    password: yup.string().required('The property password is required'),
-    passwordConfirmation: yup
+    full_name: yup
         .string()
-        .required('The property passwordConfirmation is required'),
+        .strict(true)
+        .required('The property full_name is required'),
+    gender: yup
+        .string()
+        .oneOf(['M', 'F'])
+        .required('The property gender is required'),
+    birth_date: yup
+        .string()
+        .matches(/^\d{4}-\d{2}-\d{2}$/)
+        .required('The property birth_date is required'),
+    city_id: yup
+        .string()
+        .strict(true)
+        .uuid()
+        .required('The property city_id is required'),
 });
 
 export const updateCustomerSchema = yup.object().shape({
-    name: yup.string().optional(),
-    email: yup.string().email().optional(),
+    full_name: yup.string().strict(true).optional(),
+});
+
+export const findCustomerByNameSchema = yup.object().shape({
+    full_name: yup.string().strict(true).optional(),
 });

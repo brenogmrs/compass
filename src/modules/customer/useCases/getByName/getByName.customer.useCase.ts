@@ -4,21 +4,21 @@ import { CustomerEntity } from '../../entities/customer.entity';
 import { ICustomerRepository } from '../../repositories/interfaces/customer.repository.interface';
 
 @injectable()
-export class GetCustomerByIdUseCase {
+export class GetCustomerByNameUseCase {
     constructor(
         @inject('CustomerRepository')
         private customerRepository: ICustomerRepository,
     ) {}
 
-    public async execute(customerId: string): Promise<CustomerEntity> {
-        const foundCustomerByEmail = await this.customerRepository.findById(
-            customerId,
+    public async execute(customerName: string): Promise<CustomerEntity[]> {
+        const foundCustomerByName = await this.customerRepository.findByName(
+            customerName,
         );
 
-        if (!foundCustomerByEmail) {
-            throw new HttpError('Customer not found', 404);
+        if (foundCustomerByName.length <= 0) {
+            throw new HttpError('No customer with this name was found', 404);
         }
 
-        return foundCustomerByEmail;
+        return foundCustomerByName;
     }
 }

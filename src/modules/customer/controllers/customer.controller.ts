@@ -1,13 +1,17 @@
 import { Request, Response } from 'express';
-
 import { container } from 'tsyringe';
+import { parse } from 'url';
 import { idParamSchema } from '../../../common/validators';
-
 import { CreateCustomerUseCase } from '../useCases/create/create.customer.useCase';
 import { DeleteCustomerUseCase } from '../useCases/delete/delete.customer.useCase';
 import { GetCustomerByIdUseCase } from '../useCases/getById/getById.customer.useCase';
+import { GetCustomerByNameUseCase } from '../useCases/getByName/getByName.customer.useCase';
 import { UpdateCustomerUseCase } from '../useCases/update/update.customer.useCase';
-import { createCustomerSchema, updateCustomerSchema } from '../utils/validators';
+import {
+    createCustomerSchema,
+    findCustomerByNameSchema,
+    updateCustomerSchema,
+} from '../utils/validators';
 
 export class CustomerController {
     public async store(request: Request, response: Response): Promise<Response> {
@@ -16,20 +20,13 @@ export class CustomerController {
             stripUnknown: true,
         });
 
-        const { name, email, password, passwordConfirmation } = request.body;
+        const { body } = request;
 
         const createCustomerUseCase = container.resolve(CreateCustomerUseCase);
 
-        const result = await createCustomerUseCase.execute({
-            name,
-            email,
-            password,
-            passwordConfirmation,
-        });
+        const result = await createCustomerUseCase.execute(body);
 
-        const { password: createdPassword, ...customerCreated } = result;
-
-        return response.status(201).json(customerCreated);
+        return response.status(201).json(result);
     }
 
     public async getById(request: Request, response: Response): Promise<Response> {
@@ -43,6 +40,19 @@ export class CustomerController {
         const getCustomerById = container.resolve(GetCustomerByIdUseCase);
 
         const foundCustomer = await getCustomerById.execute(id);
+
+        return response.status(200).json(foundCustomer);
+    }
+
+    public async getByName(request: Request, response: Response): Promise<Response> {
+        const query = await findCustomerByNameSchema.validate(request.query, {
+            abortEarly: false,
+            stripUnknown: true,
+        });
+
+        const getCustomerByName = container.resolve(GetCustomerByNameUseCase);
+
+        const foundCustomer = await getCustomerByName.execute(query.name);
 
         return response.status(200).json(foundCustomer);
     }
