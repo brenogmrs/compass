@@ -1,4 +1,6 @@
 import { container, delay } from 'tsyringe';
+import { CityRepository } from '../modules/city/repositories/city.repository';
+import { ICityRepository } from '../modules/city/repositories/interfaces/city.repository.interface';
 import { CustomerRepository } from '../modules/customer/repositories/customer.repository';
 import { ICustomerRepository } from '../modules/customer/repositories/interfaces/customer.repository.interface';
 import { CreateCustomerUseCase } from '../modules/customer/useCases/create/create.customer.useCase';
@@ -10,6 +12,11 @@ import { UpdateCustomerUseCase } from '../modules/customer/useCases/update/updat
 container.registerSingleton<ICustomerRepository>(
     'CustomerRepository',
     delay(() => CustomerRepository),
+);
+
+container.registerSingleton<ICityRepository>(
+    'CityRepository',
+    delay(() => CityRepository),
 );
 
 container.registerSingleton<CreateCustomerUseCase>(

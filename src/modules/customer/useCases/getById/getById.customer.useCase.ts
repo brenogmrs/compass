@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { HttpError } from '../../../../common/errors/http.error';
-import { CustomerEntity } from '../../entities/customer.entity';
+import { IFindCustomerResponse } from '../../interfaces/customer.interface';
 import { ICustomerRepository } from '../../repositories/interfaces/customer.repository.interface';
 
 @injectable()
@@ -10,7 +10,7 @@ export class GetCustomerByIdUseCase {
         private customerRepository: ICustomerRepository,
     ) {}
 
-    public async execute(customerId: string): Promise<CustomerEntity> {
+    public async execute(customerId: string): Promise<IFindCustomerResponse> {
         const foundCustomerByEmail = await this.customerRepository.findById(
             customerId,
         );
@@ -19,6 +19,22 @@ export class GetCustomerByIdUseCase {
             throw new HttpError('Customer not found', 404);
         }
 
-        return foundCustomerByEmail;
+        const age = this.calculateAge(foundCustomerByEmail.birth_date);
+
+        return {
+            ...foundCustomerByEmail,
+            age,
+        };
+    }
+
+    public calculateAge(birth_date: string): number {
+        return Math.floor(
+            (Date.now() - new Date(birth_date).getTime()) /
+                1000 /
+                60 /
+                60 /
+                24 /
+                365,
+        );
     }
 }
