@@ -1,19 +1,19 @@
 import { getConnection } from 'typeorm';
 import { getDatabaseConfigConnectionQA } from '../../../../config/database/connection';
-import { CustomerEntiy } from '../../entities/customer.entity';
-import { CustomerRepository } from '../customer.repository';
+import { CityEntity } from '../../entities/city.entity';
+import { CityRepository } from '../city.repository';
 
-describe('customer repository context', () => {
-    let customerRepository: CustomerRepository;
+describe('city repository context', () => {
+    let cityRepository: CityRepository;
 
     beforeAll(async () => {
         await getDatabaseConfigConnectionQA();
 
-        customerRepository = new CustomerRepository();
+        cityRepository = new CityRepository();
     });
 
     afterEach(async () => {
-        await getConnection().manager.clear(CustomerEntiy);
+        await getConnection().manager.clear(CityEntity);
         jest.resetAllMocks();
     });
 
@@ -23,83 +23,67 @@ describe('customer repository context', () => {
 
     it('should create a customer', async () => {
         const data = {
-            name: 'Gandalf',
-            email: 'gandalfthegrey@teste.com',
-            password: 'jumpufools',
+            name: 'bh',
+            uf: 'MG',
         };
 
-        const res = await customerRepository.createAndSave(data);
+        const res = await cityRepository.createAndSave(data);
 
         expect(res).toEqual(expect.objectContaining(data));
     });
 
-    it('should find a customer by id', async () => {
+    it('should find a city by id', async () => {
         const data = {
-            name: 'bilbo',
-            email: 'bilbobaggings@teste.com',
-            password: 'holeintheground',
+            name: 'bh',
+            uf: 'MG',
         };
 
-        const createdCustomer = await customerRepository.createAndSave(data);
+        const createdCity = await cityRepository.createAndSave(data);
 
-        const foundCustomer = await customerRepository.findById(createdCustomer.id);
+        const foundCity = await cityRepository.findById(createdCity.id);
 
-        expect(foundCustomer!.id).toEqual(createdCustomer.id);
+        expect(foundCity!.id).toEqual(createdCity.id);
     });
 
-    it('should find a customer by email', async () => {
+    it('should find a city by name', async () => {
         const data = {
-            name: 'Gandalf',
-            email: 'gandalfthegrey@teste.com',
-            password: 'jumpufools',
+            name: 'bh',
+            uf: 'MG',
         };
 
-        const createdCustomer = await customerRepository.createAndSave(data);
+        const createdCity = await cityRepository.createAndSave(data);
 
-        const foundCustomer = await customerRepository.findByEmail(
-            createdCustomer.email,
+        const foundCity = await cityRepository.findByName(createdCity.name);
+
+        expect(foundCity).toEqual({ ...createdCity });
+    });
+
+    it('should find a cities by uf', async () => {
+        const data = {
+            name: 'bh',
+            uf: 'MG',
+        };
+
+        const createdCity = await cityRepository.createAndSave(data);
+
+        const [foundCity] = await cityRepository.findByUf(createdCity.uf);
+
+        expect(foundCity).toEqual(expect.objectContaining(data));
+    });
+
+    it('should find a city by uf and name', async () => {
+        const data = {
+            name: 'bh',
+            uf: 'MG',
+        };
+
+        const createdCity = await cityRepository.createAndSave(data);
+
+        const foundCity = await cityRepository.findByNameAndUf(
+            createdCity.name,
+            createdCity.uf,
         );
 
-        expect(foundCustomer).toEqual({ ...createdCustomer, wishList: [] });
-    });
-
-    it('should update customer', async () => {
-        const data = {
-            name: 'Gandalf',
-            email: 'gandalfthegrey@teste.com',
-            password: 'jumpufools',
-        };
-
-        const updateBody = {
-            name: 'Gandalf the wite',
-            email: 'gandalfthewhite@teste.com',
-        };
-
-        const createdCustomer = await customerRepository.createAndSave(data);
-
-        const expectedRes = {
-            ...createdCustomer,
-            ...updateBody,
-        };
-
-        const updateCustomer = await customerRepository.update(expectedRes);
-
-        expect(updateCustomer).toEqual(expectedRes);
-    });
-
-    it('should delete a customer', async () => {
-        const data = {
-            name: 'Gandalf',
-            email: 'gandalfthegrey@teste.com',
-            password: 'jumpufools',
-        };
-
-        const createdCustomer = await customerRepository.createAndSave(data);
-
-        await customerRepository.delete(createdCustomer);
-
-        const foundCustomer = await customerRepository.findById(createdCustomer.id);
-
-        expect(foundCustomer).toBeUndefined();
+        expect(foundCity).toEqual(expect.objectContaining(data));
     });
 });
