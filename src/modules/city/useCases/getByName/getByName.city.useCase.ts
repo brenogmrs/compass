@@ -11,7 +11,11 @@ export class GetCityByNameUseCase {
     ) {}
 
     public async execute(cityName: string): Promise<CityEntity> {
-        const foundCity = await this.customerRepository.findById(cityName);
+        const upperCaseCityName = cityName.toUpperCase();
+
+        const foundCity = await this.customerRepository.findByName(
+            upperCaseCityName,
+        );
 
         if (!foundCity) {
             throw new HttpError('City not found', 404);

@@ -1,48 +1,46 @@
 import 'reflect-metadata';
 import sinon from 'sinon';
-import { container } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
-import { CustomerRepository } from '../../../repositories/customer.repository';
-import { GetCustomerByIdUseCase } from '../getById.customer.useCase';
+import { CityRepository } from '../../../repositories/city.repository';
+import { GetCityByIdUseCase } from '../getById.city.useCase';
 
 describe('Get customer by id use case context', () => {
-    let customerRepository: sinon.SinonStubbedInstance<CustomerRepository>;
-    let getCustomerByIdUseCase: GetCustomerByIdUseCase;
+    let cityRepository: sinon.SinonStubbedInstance<CityRepository>;
+
+    let getCityByIdUseCase: GetCityByIdUseCase;
 
     beforeEach(() => {
         sinon.restore();
-        customerRepository = sinon.createStubInstance(CustomerRepository);
-        getCustomerByIdUseCase = new GetCustomerByIdUseCase(customerRepository);
+        cityRepository = sinon.createStubInstance(CityRepository);
+
+        getCityByIdUseCase = new GetCityByIdUseCase(cityRepository);
     });
+
     it('should find a customer by id', async () => {
+        const id = uuid();
         const data = {
-            name: 'name',
-            email: 'email',
-            password: 'password',
-            passwordConfirmation: 'password',
-            id: uuid(),
-            created_at: new Date(),
-            updated_at: new Date(),
+            name: 'belo horizonte',
+            uf: 'mg',
         };
 
-        sinon.stub(container, 'resolve').returns(customerRepository);
+        const findByIdSpy = jest
+            .spyOn(cityRepository, 'findById')
+            .mockResolvedValue(<any>data);
 
-        customerRepository.findById.resolves(<any>data);
-
-        const res = await getCustomerByIdUseCase.execute(data.id);
+        const res = await getCityByIdUseCase.execute(id);
 
         expect(res).toEqual(data);
+        expect(findByIdSpy).toHaveBeenNthCalledWith(1, id);
     });
 
     it('should not find a customer by id', async () => {
-        sinon.stub(container, 'resolve').returns(customerRepository);
-
-        customerRepository.findById.resolves(undefined);
+        expect.hasAssertions();
+        jest.spyOn(cityRepository, 'findById').mockResolvedValue(undefined);
 
         try {
-            await getCustomerByIdUseCase.execute('data.id');
+            await getCityByIdUseCase.execute('id');
         } catch (error: any) {
-            expect(error.message).toEqual('Customer not found');
+            expect(error.message).toEqual('City not found');
             expect(error.code).toEqual(404);
         }
     });

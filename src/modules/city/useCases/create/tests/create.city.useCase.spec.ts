@@ -48,4 +48,30 @@ describe('Create city use case context', () => {
 
         expect(createAndSaveSpy).toHaveBeenNthCalledWith(1, expectedRes);
     });
+
+    it('should not create a already existing city', async () => {
+        const data = {
+            name: 'belo horizonte',
+            uf: 'mg',
+        };
+
+        const expectedRes = {
+            name: 'BELO HORIZONTE',
+            uf: 'MG',
+        };
+
+        const findCityByNameAndUfSpy = jest
+            .spyOn(cityRepository, 'findByNameAndUf')
+            .mockResolvedValue(<any>data);
+
+        try {
+            await createCityUseCase.execute(data);
+        } catch (error: any) {
+            console.log(error);
+            expect(error.message).toEqual(
+                'There is already a city with this name in this uf',
+            );
+            expect(error.code).toEqual(409);
+        }
+    });
 });
