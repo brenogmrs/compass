@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import { CityRepository } from '../../../repositories/city.repository';
 import { GetCityByNameUseCase } from '../getByName.city.useCase';
 
-describe('Get customer by id use case context', () => {
+describe('Get city by name use case context', () => {
     let cityRepository: sinon.SinonStubbedInstance<CityRepository>;
 
     let getCityByNameUseCase: GetCityByNameUseCase;

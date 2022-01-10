@@ -22,11 +22,9 @@ export class GetCustomerByNameUseCase {
             throw new HttpError('No customer with this name was found', 404);
         }
 
-        return (
-            foundCustomerByName.map(item => ({
-                ...item,
-                age: calculateAge(item.birth_date),
-            })) || []
-        );
+        return foundCustomerByName.map(item => ({
+            ...item,
+            age: calculateAge(item.birth_date),
+        }));
     }
 }
