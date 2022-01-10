@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm';
 import { getDatabaseConfigConnectionQA } from '../../../../config/database/connection';
-import { Customer } from '../../entities/customer.entity';
+import { CustomerEntiy } from '../../entities/customer.entity';
 import { CustomerRepository } from '../customer.repository';
 
 describe('customer repository context', () => {
@@ -13,7 +13,7 @@ describe('customer repository context', () => {
     });
 
     afterEach(async () => {
-        await getConnection().manager.clear(Customer);
+        await getConnection().manager.clear(CustomerEntiy);
         jest.resetAllMocks();
     });
 

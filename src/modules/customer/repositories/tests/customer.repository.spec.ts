@@ -1,10 +1,15 @@
 import { getConnection } from 'typeorm';
+import { v4 as uuid } from 'uuid';
 import { getDatabaseConfigConnectionQA } from '../../../../config/database/connection';
 import { CustomerEntity } from '../../entities/customer.entity';
 import { CustomerRepository } from '../customer.repository';
 
 describe('customer repository context', () => {
     let customerRepository: CustomerRepository;
+
+    beforeEach(async () => {
+        await getConnection().query('PRAGMA foreign_keys=OFF');
+    });
 
     beforeAll(async () => {
         await getDatabaseConfigConnectionQA();
@@ -14,6 +19,7 @@ describe('customer repository context', () => {
 
     afterEach(async () => {
         await getConnection().manager.clear(CustomerEntity);
+
         jest.resetAllMocks();
     });
 
@@ -23,9 +29,10 @@ describe('customer repository context', () => {
 
     it('should create a customer', async () => {
         const data = {
-            name: 'Gandalf',
-            email: 'gandalfthegrey@teste.com',
-            password: 'jumpufools',
+            full_name: 'bilbo baggins',
+            gender: 'M',
+            city_id: uuid(),
+            birth_date: '1997-06-06',
         };
 
         const res = await customerRepository.createAndSave(data);
@@ -35,9 +42,10 @@ describe('customer repository context', () => {
 
     it('should find a customer by id', async () => {
         const data = {
-            name: 'bilbo',
-            email: 'bilbobaggings@teste.com',
-            password: 'holeintheground',
+            full_name: 'bilbo baggins',
+            gender: 'M',
+            city_id: uuid(),
+            birth_date: '1997-06-06',
         };
 
         const createdCustomer = await customerRepository.createAndSave(data);
@@ -47,59 +55,23 @@ describe('customer repository context', () => {
         expect(foundCustomer!.id).toEqual(createdCustomer.id);
     });
 
-    it('should find a customer by email', async () => {
+    it('should find a customers by name', async () => {
         const data = {
-            name: 'Gandalf',
-            email: 'gandalfthegrey@teste.com',
-            password: 'jumpufools',
+            full_name: 'bilbo baggins',
+            gender: 'M',
+            city_id: uuid(),
+            birth_date: '1997-06-06',
         };
 
         const createdCustomer = await customerRepository.createAndSave(data);
 
-        const foundCustomer = await customerRepository.findByEmail(
-            createdCustomer.email,
+        const [foundCustomer] = await customerRepository.findByName(
+            createdCustomer.full_name,
         );
 
-        expect(foundCustomer).toEqual({ ...createdCustomer, wishList: [] });
-    });
-
-    it('should update customer', async () => {
-        const data = {
-            name: 'Gandalf',
-            email: 'gandalfthegrey@teste.com',
-            password: 'jumpufools',
-        };
-
-        const updateBody = {
-            name: 'Gandalf the wite',
-            email: 'gandalfthewhite@teste.com',
-        };
-
-        const createdCustomer = await customerRepository.createAndSave(data);
-
-        const expectedRes = {
-            ...createdCustomer,
-            ...updateBody,
-        };
-
-        const updateCustomer = await customerRepository.update(expectedRes);
-
-        expect(updateCustomer).toEqual(expectedRes);
-    });
-
-    it('should delete a customer', async () => {
-        const data = {
-            name: 'Gandalf',
-            email: 'gandalfthegrey@teste.com',
-            password: 'jumpufools',
-        };
-
-        const createdCustomer = await customerRepository.createAndSave(data);
-
-        await customerRepository.delete(createdCustomer);
-
-        const foundCustomer = await customerRepository.findById(createdCustomer.id);
-
-        expect(foundCustomer).toBeUndefined();
+        const { created_at, updated_at, ...customerData } = foundCustomer;
+        expect(foundCustomer).toEqual(expect.objectContaining(customerData));
+        expect(created_at).toBeDefined();
+        expect(updated_at).toBeDefined();
     });
 });
