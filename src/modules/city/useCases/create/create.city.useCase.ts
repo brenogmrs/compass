@@ -23,9 +23,16 @@ export class CreateCityUseCase {
             );
         }
 
-        return this.cityRepository.createAndSave({
-            name: name.toUpperCase(),
-            uf: uf.toUpperCase(),
-        });
+        const newCityData = { ...cityData } as any;
+
+        const dataWithUpperCaseValues = Object.keys(newCityData).reduce(
+            (acc: any, key) => {
+                acc[key] = newCityData[key].toUpperCase();
+                return acc;
+            },
+            {},
+        );
+
+        return this.cityRepository.createAndSave({ ...dataWithUpperCaseValues });
     }
 }

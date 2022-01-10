@@ -5,7 +5,7 @@ import { CustomerRepository } from '../../../repositories/customer.repository';
 import { calculateAge } from '../../../utils/functions/calculateAge';
 import { GetCustomerByNameUseCase } from '../getByName.customer.useCase';
 
-describe('Get customer by id use case context', () => {
+describe('Get customer by name use case context', () => {
     let customerRepository: sinon.SinonStubbedInstance<CustomerRepository>;
     let getCustomerByNameUseCase: GetCustomerByNameUseCase;
 

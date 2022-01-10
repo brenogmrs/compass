@@ -1,103 +1,51 @@
+import exp from 'constants';
 import 'reflect-metadata';
 import sinon from 'sinon';
 import { container } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
-import { CustomerRepository } from '../../../repositories/customer.repository';
-import { HashPassword } from '../../../utils/hashPassword';
-import { CreateCustomerUseCase } from '../create.customer.useCase';
+import { CityRepository } from '../../../repositories/city.repository';
+import { CreateCityUseCase } from '../create.city.useCase';
 
-describe('Create customer use case context', () => {
-    let customerRepository: sinon.SinonStubbedInstance<CustomerRepository>;
-    let hashPassword: sinon.SinonStubbedInstance<HashPassword>;
-    let createCustomerUseCase: CreateCustomerUseCase;
+describe('Create city use case context', () => {
+    let cityRepository: sinon.SinonStubbedInstance<CityRepository>;
+
+    let createCityUseCase: CreateCityUseCase;
 
     beforeEach(() => {
         sinon.restore();
-        customerRepository = sinon.createStubInstance(CustomerRepository);
-        hashPassword = sinon.createStubInstance(HashPassword);
+        cityRepository = sinon.createStubInstance(CityRepository);
 
-        createCustomerUseCase = new CreateCustomerUseCase(
-            customerRepository,
-            hashPassword,
-        );
+        createCityUseCase = new CreateCityUseCase(cityRepository);
     });
 
-    it('should create a customer', async () => {
+    it('should create a city', async () => {
         const data = {
-            name: 'name',
-            email: 'email',
-            password: 'password',
-            passwordConfirmation: 'password',
-            id: uuid(),
-            created_at: new Date(),
-            updated_at: new Date(),
+            name: 'belo horizonte',
+            uf: 'mg',
         };
 
         const expectedRes = {
-            ...data,
-            password: 'hashpassword',
+            name: 'BELO HORIZONTE',
+            uf: 'MG',
         };
 
-        sinon.stub(container, 'resolve').returns(customerRepository);
+        const findCityByNameAndUfSpy = jest
+            .spyOn(cityRepository, 'findByNameAndUf')
+            .mockResolvedValue(<any>undefined);
 
-        customerRepository.createAndSave.resolves(<any>expectedRes);
+        const createAndSaveSpy = jest
+            .spyOn(cityRepository, 'createAndSave')
+            .mockResolvedValue(<any>expectedRes);
 
-        customerRepository.findById.resolves(undefined);
-
-        hashPassword.generate.resolves('hashpassword');
-
-        const res = await createCustomerUseCase.execute(data);
+        const res = await createCityUseCase.execute(data);
 
         expect(res).toEqual(expectedRes);
-    });
+        expect(findCityByNameAndUfSpy).toHaveBeenNthCalledWith(
+            1,
+            data.name,
+            data.uf,
+        );
 
-    it('should not create a customer with different password and passwordConfirmation', async () => {
-        const data = {
-            name: 'name',
-            email: 'email',
-            password: 'password',
-            passwordConfirmation: 'passwordConfirmation',
-            id: uuid(),
-            created_at: new Date(),
-            updated_at: new Date(),
-        };
-
-        sinon.stub(container, 'resolve').returns(customerRepository);
-
-        customerRepository.findById.resolves(undefined);
-
-        hashPassword.generate.resolves('hashpassword');
-
-        try {
-            await createCustomerUseCase.execute(data);
-        } catch (error: any) {
-            expect(error.message).toEqual(
-                'The password and passwordConfirmation must be the same',
-            );
-            expect(error.code).toEqual(400);
-        }
-    });
-
-    it('should not create a customer with existing email', async () => {
-        const data = {
-            name: 'name',
-            email: 'email',
-            password: 'password',
-            passwordConfirmation: 'password',
-            id: uuid(),
-            created_at: new Date(),
-            updated_at: new Date(),
-        };
-
-        sinon.stub(container, 'resolve').returns(customerRepository);
-
-        customerRepository.findByEmail.resolves(<any>data);
-
-        try {
-            await createCustomerUseCase.execute(data);
-        } catch (error: any) {
-            expect(error.message).toEqual('Email address already exists');
-            expect(error.code).toEqual(409);
-        }
+        expect(createAndSaveSpy).toHaveBeenNthCalledWith(1, expectedRes);
     });
 });
