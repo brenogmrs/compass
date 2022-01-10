@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import sinon from 'sinon';
-import { container } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
 import { CustomerRepository } from '../../../repositories/customer.repository';
 import { GetCustomerByIdUseCase } from '../../getById/getById.customer.useCase';
