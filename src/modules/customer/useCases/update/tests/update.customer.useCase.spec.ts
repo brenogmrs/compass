@@ -22,14 +22,13 @@ describe('update customer use case context', () => {
         );
     });
     it('should update customer', async () => {
+        const id = uuid();
+
         const data = {
-            name: 'name',
-            email: 'email',
-            password: 'password',
-            passwordConfirmation: 'password',
-            id: uuid(),
-            created_at: new Date(),
-            updated_at: new Date(),
+            full_name: 'bilbo baggins',
+            gender: 'M',
+            city_id: uuid(),
+            birth_date: '1997-06-06',
         };
 
         const updateBody = {
@@ -41,51 +40,18 @@ describe('update customer use case context', () => {
             ...updateBody,
         };
 
-        sinon.stub(container, 'resolve').returns(updateCustomerUseCase);
+        const getCustomerByIdUseCaseSpy = jest
+            .spyOn(getCustomerByIdUseCase, 'execute')
+            .mockResolvedValue(<any>data);
 
-        sinon.stub(getCustomerByIdUseCase, 'execute').resolves(<any>data);
+        const customerRepositorySpy = jest
+            .spyOn(customerRepository, 'update')
+            .mockResolvedValue(<any>expectedRes);
 
-        customerRepository.update.resolves(<any>expectedRes);
-
-        const res = await updateCustomerUseCase.execute(data.id, updateBody);
+        const res = await updateCustomerUseCase.execute(id, updateBody);
 
         expect(res).toEqual(expectedRes);
-    });
-
-    it('should update customer with existing email', async () => {
-        expect.hasAssertions();
-
-        const data = {
-            name: 'name',
-            email: 'email',
-            password: 'password',
-            passwordConfirmation: 'password',
-            id: uuid(),
-            created_at: new Date(),
-            updated_at: new Date(),
-        };
-
-        const updateBody = {
-            email: 'email',
-        };
-
-        const expectedRes = {
-            ...data,
-            ...updateBody,
-        };
-
-        sinon.stub(container, 'resolve').returns(updateCustomerUseCase);
-
-        sinon.stub(getCustomerByIdUseCase, 'execute').resolves(<any>data);
-
-        customerRepository.findByEmail.resolves(<any>data);
-        customerRepository.update.resolves(<any>expectedRes);
-
-        try {
-            await updateCustomerUseCase.execute(data.id, updateBody);
-        } catch (error: any) {
-            expect(error.message).toEqual('Email address already exists');
-            expect(error.code).toEqual(409);
-        }
+        expect(getCustomerByIdUseCaseSpy).toHaveBeenNthCalledWith(1, id);
+        expect(customerRepositorySpy).toHaveBeenNthCalledWith(1, expectedRes);
     });
 });

@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import sinon from 'sinon';
-import { container } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
 import { CustomerRepository } from '../../../repositories/customer.repository';
+import { calculateAge } from '../../../utils/functions/calculateAge';
 import { GetCustomerByIdUseCase } from '../getById.customer.useCase';
 
 describe('Get customer by id use case context', () => {
@@ -14,30 +14,35 @@ describe('Get customer by id use case context', () => {
         customerRepository = sinon.createStubInstance(CustomerRepository);
         getCustomerByIdUseCase = new GetCustomerByIdUseCase(customerRepository);
     });
+
     it('should find a customer by id', async () => {
         const data = {
-            name: 'name',
-            email: 'email',
-            password: 'password',
-            passwordConfirmation: 'password',
+            full_name: 'bilbo baggins',
+            gender: 'M',
+            city_id: uuid(),
+            birth_date: '1996-06-06',
             id: uuid(),
-            created_at: new Date(),
-            updated_at: new Date(),
         };
 
-        sinon.stub(container, 'resolve').returns(customerRepository);
+        const customerRepositorySpy = jest
+            .spyOn(customerRepository, 'findById')
+            .mockResolvedValue(<any>data);
 
-        customerRepository.findById.resolves(<any>data);
+        const expectedRes = {
+            ...data,
+            age: calculateAge(data.birth_date),
+        };
 
         const res = await getCustomerByIdUseCase.execute(data.id);
 
-        expect(res).toEqual(data);
+        expect(res).toEqual(expectedRes);
+        expect(customerRepositorySpy).toHaveBeenNthCalledWith(1, data.id);
     });
 
     it('should not find a customer by id', async () => {
-        sinon.stub(container, 'resolve').returns(customerRepository);
+        expect.hasAssertions();
 
-        customerRepository.findById.resolves(undefined);
+        jest.spyOn(customerRepository, 'findById').mockResolvedValue(<any>undefined);
 
         try {
             await getCustomerByIdUseCase.execute('data.id');

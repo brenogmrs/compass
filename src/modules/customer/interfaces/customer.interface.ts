@@ -3,7 +3,7 @@ import { CustomerEntity } from '../entities/customer.entity';
 export interface ICreateCustomer {
     full_name: string;
     gender: string;
-    city_id?: string;
+    city_id: string;
     birth_date: string;
 }
 

@@ -15,11 +15,9 @@ export class CreateCustomerUseCase {
     ) {}
 
     public async execute(customerData: ICreateCustomer): Promise<CustomerEntity> {
-        const { full_name } = customerData;
+        const { full_name, city_id } = customerData;
 
-        if (customerData.city_id) {
-            await this.getCityByIdUseCase.execute(customerData.city_id);
-        }
+        await this.getCityByIdUseCase.execute(city_id);
 
         const upperCaseFullName = full_name.toUpperCase();
 

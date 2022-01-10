@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import sinon from 'sinon';
-import { container } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
 import { CustomerRepository } from '../../../repositories/customer.repository';
 import { GetCustomerByIdUseCase } from '../../getById/getById.customer.useCase';
@@ -23,20 +22,20 @@ describe('delete customer use case context', () => {
     });
     it('should delete a customer', async () => {
         const data = {
-            name: 'name',
-            email: 'email',
-            password: 'password',
-            passwordConfirmation: 'password',
+            full_name: 'bilbo baggins',
+            gender: 'M',
+            city_id: uuid(),
+            birth_date: '1997-06-06',
             id: uuid(),
-            created_at: new Date(),
-            updated_at: new Date(),
         };
 
-        sinon.stub(container, 'resolve').returns(deleteCustomerUseCase);
+        const getCustomerByIdUseCaseSpy = jest
+            .spyOn(getCustomerByIdUseCase, 'execute')
+            .mockResolvedValue(<any>data);
 
-        sinon.stub(getCustomerByIdUseCase, 'execute').resolves(<any>data);
-
-        customerRepository.delete.resolves(<any>undefined);
+        const customerRepositorySpy = jest
+            .spyOn(customerRepository, 'delete')
+            .mockResolvedValue(<any>undefined);
 
         const deleteCustomerUseCaseSpy = jest.spyOn(
             deleteCustomerUseCase,
@@ -46,5 +45,7 @@ describe('delete customer use case context', () => {
         await deleteCustomerUseCase.execute(data.id);
 
         expect(deleteCustomerUseCaseSpy).toHaveBeenNthCalledWith(1, data.id);
+        expect(getCustomerByIdUseCaseSpy).toHaveBeenNthCalledWith(1, data.id);
+        expect(customerRepositorySpy).toHaveBeenNthCalledWith(1, data);
     });
 });

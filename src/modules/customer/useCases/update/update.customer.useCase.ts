@@ -1,5 +1,4 @@
 import { inject, injectable } from 'tsyringe';
-import { HttpError } from '../../../../common/errors/http.error';
 import { CustomerEntity } from '../../entities/customer.entity';
 import { IUpdateCustomer } from '../../interfaces/customer.interface';
 import { ICustomerRepository } from '../../repositories/interfaces/customer.repository.interface';
@@ -20,8 +19,6 @@ export class UpdateCustomerUseCase {
         customerData: IUpdateCustomer,
     ): Promise<CustomerEntity> {
         const foundCustomer = await this.getByIdUseCase.execute(id);
-
-        //verificar se a cidade existe
 
         const updatedCustomer = {
             ...foundCustomer,

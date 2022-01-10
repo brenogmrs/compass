@@ -12,17 +12,21 @@ export class GetCustomerByNameUseCase {
     ) {}
 
     public async execute(customerName: string): Promise<CustomerEntity[]> {
+        const upperCaseCustomerName = customerName.toUpperCase();
+
         const foundCustomerByName = await this.customerRepository.findByName(
-            customerName,
+            upperCaseCustomerName,
         );
 
         if (foundCustomerByName.length <= 0) {
             throw new HttpError('No customer with this name was found', 404);
         }
 
-        return foundCustomerByName.map(item => ({
-            ...item,
-            age: calculateAge(item.birth_date),
-        }));
+        return (
+            foundCustomerByName.map(item => ({
+                ...item,
+                age: calculateAge(item.birth_date),
+            })) || []
+        );
     }
 }
