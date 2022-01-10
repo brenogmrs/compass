@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import customerRoutes from './modules/customer/routes/customer.routes';
-import wishListRoutes from './modules/wishlist/routes/wishList.routes';
+import cityRoutes from './modules/city/routes/city.routes';
 
 const routes = Router();
 
 routes.use('/api/customer', customerRoutes);
-
-routes.use('/api/wishlist', wishListRoutes);
+routes.use('/api/city', cityRoutes);
 
 export { routes };

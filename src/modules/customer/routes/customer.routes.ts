@@ -7,9 +7,9 @@ const customerController = new CustomerController();
 
 routes.post('/', customerController.store);
 
-routes.get('/:id', customerController.getById);
+routes.get('/name', customerController.getByName);
 
-routes.get('name', customerController.getByName);
+routes.get('/:id', customerController.getById);
 
 routes.put('/:id', customerController.update);
 

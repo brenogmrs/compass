@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { parse } from 'url';
 import { idParamSchema } from '../../../common/validators';
 import { CreateCustomerUseCase } from '../useCases/create/create.customer.useCase';
 import { DeleteCustomerUseCase } from '../useCases/delete/delete.customer.useCase';
@@ -52,7 +51,7 @@ export class CustomerController {
 
         const getCustomerByName = container.resolve(GetCustomerByNameUseCase);
 
-        const foundCustomer = await getCustomerByName.execute(query.name);
+        const foundCustomer = await getCustomerByName.execute(query.full_name!);
 
         return response.status(200).json(foundCustomer);
     }

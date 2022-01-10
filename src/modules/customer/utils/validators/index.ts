@@ -25,5 +25,8 @@ export const updateCustomerSchema = yup.object().shape({
 });
 
 export const findCustomerByNameSchema = yup.object().shape({
-    full_name: yup.string().strict(true).optional(),
+    full_name: yup
+        .string()
+        .strict(true)
+        .required('The property full_name is required'),
 });
