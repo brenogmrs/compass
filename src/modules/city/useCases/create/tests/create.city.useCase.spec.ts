@@ -67,7 +67,6 @@ describe('Create city use case context', () => {
         try {
             await createCityUseCase.execute(data);
         } catch (error: any) {
-            console.log(error);
             expect(error.message).toEqual(
                 'There is already a city with this name in this uf',
             );

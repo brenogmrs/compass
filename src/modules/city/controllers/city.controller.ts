@@ -41,14 +41,14 @@ export class CityController {
     }
 
     public async getByUf(request: Request, response: Response): Promise<Response> {
-        const params = await getCitiesByUfSchema.validate(request.params, {
+        const query = await getCitiesByUfSchema.validate(request.query, {
             abortEarly: false,
             stripUnknown: true,
         });
 
         const getCitiesByUf = container.resolve(GetCitiesByUfUseCase);
 
-        const foundCities = await getCitiesByUf.execute(params.uf);
+        const foundCities = await getCitiesByUf.execute(query.uf);
 
         return response.status(200).json(foundCities);
     }

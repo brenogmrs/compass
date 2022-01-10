@@ -7,8 +7,8 @@ const customerController = new CityController();
 
 routes.post('/', customerController.store);
 
-routes.get('name/', customerController.getByName);
+routes.get('/name', customerController.getByName);
 
-routes.put('/:uf', customerController.getByUf);
+routes.get('/uf', customerController.getByUf);
 
 export default routes;
