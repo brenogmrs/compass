@@ -1,0 +1,1 @@
+CREATE DATABASE compasso_uol;

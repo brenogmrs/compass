@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { GetCustomerByNameUseCase } from '../../customer/useCases/getByName/getByName.customer.useCase';
 import { CreateCityUseCase } from '../useCases/create/create.city.useCase';
+import { GetCityByNameUseCase } from '../useCases/getByName/getByName.city.useCase';
 import { GetCitiesByUfUseCase } from '../useCases/getByUf/getByUf.city.useCase';
 import {
     createCitySchema,
@@ -33,9 +33,9 @@ export class CityController {
             stripUnknown: true,
         });
 
-        const getCustomerByName = container.resolve(GetCustomerByNameUseCase);
+        const getCityByName = container.resolve(GetCityByNameUseCase);
 
-        const foundCity = await getCustomerByName.execute(query.name);
+        const foundCity = await getCityByName.execute(query.name);
 
         return response.status(200).json(foundCity);
     }

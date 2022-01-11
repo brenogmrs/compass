@@ -14,7 +14,10 @@ export class CreateCityUseCase {
     public async execute(cityData: ICreateCity): Promise<CityEntity> {
         const { name, uf } = cityData;
 
-        const foundCity = await this.cityRepository.findByNameAndUf(name, uf);
+        const foundCity = await this.cityRepository.findByNameAndUf(
+            name.toUpperCase(),
+            uf.toUpperCase(),
+        );
 
         if (foundCity) {
             throw new HttpError(

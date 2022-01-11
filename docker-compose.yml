@@ -6,9 +6,9 @@ services:
             context: .
             dockerfile: Dockerfile
             target: builder
-        command: 'npm run dev'
+        command: sh -c 'npm run m:run && npm run dev'
         ports:
-            - '3010:3010'
+            - '3000:3000'
         volumes:
             - .:/usr/app
         environment:
@@ -27,6 +27,7 @@ services:
             POSTGRES_DB: compass_uol
         volumes:
             - pgdata:/var/lib/postgresql/data
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
         ports:
             - '5432:5432'
 volumes:

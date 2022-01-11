@@ -3,12 +3,12 @@ import { CityController } from '../controllers/city.controller';
 
 const routes = Router();
 
-const customerController = new CityController();
+const cityController = new CityController();
 
-routes.post('/', customerController.store);
+routes.post('/', cityController.store);
 
-routes.get('/name', customerController.getByName);
+routes.get('/name', cityController.getByName);
 
-routes.get('/uf', customerController.getByUf);
+routes.get('/uf', cityController.getByUf);
 
 export default routes;

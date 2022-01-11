@@ -11,7 +11,6 @@ COPY . .
 
 RUN npm run build
 
-
 # RUNTIME STAGE
 FROM node:lts-alpine as runtime
 
